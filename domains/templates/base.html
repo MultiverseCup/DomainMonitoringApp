@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Domain Tracker{% endblock %}</title>
+    {% load django_bootstrap5 %}  <!-- ИЗМЕНИЛИ ЗДЕСЬ -->
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        .domain-critical { background-color: #f8d7da; }
+        .domain-warning { background-color: #fff3cd; }
+        .domain-ok { background-color: #d1e7dd; }
+        .days-badge {
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'domain_list' %}">Domain Tracker</a>
+
+        <div class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text me-3">Привет, {{ user.username }}!</span>
+                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-light btn-sm">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Войти</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+    <div class="container mt-4">
+        {% bootstrap_messages %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

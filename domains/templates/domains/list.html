@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}  <!-- ИЗМЕНИЛИ ЗДЕСЬ -->
+
+{% block title %}Мои домены{% endblock %}
+
+{% block content %}
+<!-- остальной код без изменений -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total }}</h5>
+                <p class="card-text">Всего доменов</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.expiring_soon }}</h5>
+                <p class="card-text">Истекают в течение месяца</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.critical }}</h5>
+                <p class="card-text">Критически близко к окончанию</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mb-3">
+    <h2>Мои домены</h2>
+    <a href="{% url 'add_domain' %}" class="btn btn-success">+ Добавить домен</a>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Домен</th>
+            <th>Регистратор</th>
+            <th>Дата окончания</th>
+            <th>Дней осталось</th>
+            <th>Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for domain in domains %}
+        <tr class="{% if domain.days_left <= 7 %}domain-critical
+                   {% elif domain.days_left <= 30 %}domain-warning
+                   {% else %}domain-ok{% endif %}">
+            <td><strong>{{ domain.name }}</strong></td>
+            <td>{{ domain.registrar|default:"Неизвестно" }}</td>
+            <td>{{ domain.expiration_date|date:"d.m.Y"|default:"Не указана" }}</td>
+            <td>
+                <span class="days-badge
+                    {% if domain.days_left <= 7 %}bg-danger
+                    {% elif domain.days_left <= 30 %}bg-warning
+                    {% else %}bg-success{% endif %}">
+                    {{ domain.days_left|default:"?" }}
+                </span>
+            </td>
+            <td>
+                {% if domain.days_left <= 7 %}
+                <span class="text-danger">Срочно продлить!</span>
+                {% elif domain.days_left <= 30 %}
+                <span class="text-warning">Скоро истекает</span>
+                {% else %}
+                <span class="text-success">В норме</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">У вас пока нет добавленных доменов</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

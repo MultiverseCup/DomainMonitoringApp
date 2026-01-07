@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить домен{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Добавить новый домен для отслеживания</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="domain_name" class="form-label">Доменное имя</label>
+                        <input type="text"
+                               class="form-control"
+                               id="domain_name"
+                               name="name"
+                               placeholder="example.com"
+                               required>
+                        <div class="form-text">
+                            Введите доменное имя без http:// (например: mysite.com, blog.ru)
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="domain_expiration" class="form-label">Дата окончания (опционально)</label>
+                        <input type="date"
+                               class="form-control"
+                               id="domain_expiration"
+                               name="expiration_date">
+                        <div class="form-text">
+                            Если оставить пустым, система попытается получить дату автоматически через WHOIS
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="domain_registrar" class="form-label">Регистратор (опционально)</label>
+                        <input type="text"
+                               class="form-control"
+                               id="domain_registrar"
+                               name="registrar"
+                               placeholder="Reg.ru, GoDaddy и т.д.">
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'domain_list' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                        <button type="submit" class="btn btn-primary">Добавить домен</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Как это работает?</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Введите доменное имя (например: <code>google.com</code>)</li>
+                    <li>Система автоматически проверит срок регистрации через WHOIS протокол</li>
+                    <li>Домен появится в вашем списке с подсчетом дней до окончания</li>
+                    <li>Вы получите уведомления за 30, 14, 7, 3 и 1 день до истечения</li>
+                </ol>
+                <p class="mb-0"><strong>Примечание:</strong> Некоторые домены могут быть защищены WHOIS-приватностью, в этом случае потребуется ввести дату вручную.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
