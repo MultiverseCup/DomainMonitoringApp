@@ -5,6 +5,28 @@ from .models import Domain
 from .forms import DomainForm
 import whois
 from datetime import datetime
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
+
+@login_required
+def delete_domain(request, pk):
+    """Удаление домена"""
+    domain = get_object_or_404(Domain, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        domain_name = domain.name
+        domain.delete()
+        messages.success(request, f'Домен {domain_name} удален')
+
+        # Если это AJAX запрос, возвращаем JSON
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+
+        return redirect('domain_list')
+
+    # Если GET запрос - показываем страницу подтверждения
+    return render(request, 'domains/confirm_delete.html', {'domain': domain})
 
 
 @login_required

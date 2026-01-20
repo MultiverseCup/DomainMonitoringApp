@@ -45,6 +45,7 @@
             <th>Дата окончания</th>
             <th>Дней осталось</th>
             <th>Статус</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -72,10 +73,18 @@
                 <span class="text-success">В норме</span>
                 {% endif %}
             </td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger delete-btn"
+                        data-domain-id="{{ domain.id }}"
+                        data-domain-name="{{ domain.name }}"
+                        title="Удалить домен">
+                    🗑️
+                </button>
+            </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5" class="text-center">У вас пока нет добавленных доменов</td>
+            <td colspan="6" class="text-center">У вас пока нет добавленных доменов</td>
         </tr>
         {% endfor %}
     </tbody>
