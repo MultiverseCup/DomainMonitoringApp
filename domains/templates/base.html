@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Domain Tracker{% endblock %}</title>
-    {% load django_bootstrap5 %}  <!-- ИЗМЕНИЛИ ЗДЕСЬ -->
+    {% load django_bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <style>
@@ -41,5 +41,91 @@
         {% bootstrap_messages %}
         {% block content %}{% endblock %}
     </div>
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить домен <strong id="domainToDeleteName"></strong>?
+                <div class="alert alert-warning mt-2">
+                    Это действие нельзя отменить!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form id="deleteForm" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript для модального окна -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteForm = document.getElementById('deleteForm');
+    const domainNameSpan = document.getElementById('domainToDeleteName');
+
+    // Обработчик для всех кнопок удаления
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const domainId = this.getAttribute('data-domain-id');
+            const domainName = this.getAttribute('data-domain-name');
+
+            // Устанавливаем имя домена в модальном окне
+            domainNameSpan.textContent = domainName;
+
+            // Устанавливаем action формы
+            deleteForm.action = `/domains/${domainId}/delete/`;
+
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(deleteModal);
+            modal.show();
+        });
+    });
+
+    // AJAX отправка формы
+    deleteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Закрываем модальное окно
+                const modal = bootstrap.Modal.getInstance(deleteModal);
+                modal.hide();
+
+                // Перезагружаем страницу
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Если AJAX не сработал, отправляем форму обычным способом
+            form.submit();
+        });
+    });
+});
+</script>
 </body>
 </html>
